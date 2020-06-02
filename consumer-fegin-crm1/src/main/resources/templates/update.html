@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-table.css}">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Title</title>
+</head>
+<body>
+
+<table th:each="i:${in}" class="table table-hover">
+
+
+    <tr >
+        <td>编号</td>
+        <td th:text="${i.getId()}"></td>
+    </tr>
+    <tr >
+        <td>机构名称</td>
+        <td th:text="${i.getName()}"></td>
+
+    </tr>
+    <tr >
+        <td>机构级别</td>
+        <td th:text="${i.getMeclevel()}"></td>
+    </tr>
+    <tr >
+        <td>省份/市</td>
+        <td th:text="${i.getProvinceid()}"></td>
+
+    </tr>
+    <tr >
+        <td>经办人</td>
+        <td th:text="${i.getPeopled()}"></td>
+    </tr>
+    <tr >
+        <td>联系人</td>
+        <td th:text="${i.getName()}"></td>
+    </tr>
+    <tr >
+        <td>审核状态</td>
+        <td th:text="${i.getStatus()}"></td>
+    </tr>
+
+    <tr >
+        <td><input type="button" onclick="back()" value="返回"></td>
+    </tr>
+
+</table>
+
+<script>
+
+    function back() {
+        window.history.back();
+    }
+
+</script>
+
+</body>
+</html>
