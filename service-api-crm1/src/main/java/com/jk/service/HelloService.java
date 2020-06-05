@@ -1,17 +1,45 @@
 package com.jk.service;
 
-import com.jk.model.Information;
+import com.jk.model.SysUser;
 import com.jk.model.Tree;
+import com.jk.model.UserEntity;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @FeignClient("provider-crm1")
 public interface HelloService {
 
-    @GetMapping("/hello")
+
+    @RequestMapping("selectPerCodeList")
+    List<String> selectPerCodeList(@RequestParam("userId") Integer userId);
+
+    @RequestMapping("selectUserByCode")
+    SysUser selectUserByCode(@RequestParam("userName") String userName);
+
+    @RequestMapping("/hello")
+    String hello();
+
+    @PostMapping("/queryTree")
+    List<Tree> queryTree(@RequestParam("id") Integer id);
+
+    @GetMapping("/userList")
+    List<UserEntity> userList();
+
+    @RequestMapping("/toUserEdit")
+    UserEntity toUserEdit(@RequestParam("userid") Integer userid);
+
+    @RequestMapping("/editUserBean")
+    void editUserBean(@RequestBody UserEntity user);
+
+    @RequestMapping("/addUserBean")
+    void addUserBean(@RequestBody UserEntity user);
+
+    @GetMapping("/delete")
+    void delete(@RequestParam("userid") Integer userid);
+
+   /* @GetMapping("/hello")
     String hello();
 
     @RequestMapping("selectTree")
@@ -29,5 +57,5 @@ public interface HelloService {
     Information updateInfoById(@RequestParam("id") Integer id);
 
     @PostMapping("selectGoodsList")
-    Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows);
+    Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows);*/
 }

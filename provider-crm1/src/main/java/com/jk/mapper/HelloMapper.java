@@ -1,11 +1,9 @@
 package com.jk.mapper;
 
-import com.jk.model.Goods;
-import com.jk.model.Information;
+import com.jk.model.SysUser;
 import com.jk.model.Tree;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import com.jk.model.UserEntity;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -13,7 +11,49 @@ import java.util.List;
 public interface HelloMapper {
 
 
-    @Select("select * from t_tree where pid = #{id}")
+
+    @Select("select sp.percode \n" +
+            "from sys_user_role sur,\n" +
+            "sys_role_permission srp,\n" +
+            "sys_permission sp \n" +
+            "where sur.sys_user_id=#{userId} and sur.sys_role_id=srp.sys_role_id \n" +
+            "and srp.sys_permission_id=sp.id and sp.percode IS NOT NULL and sp.percode <> '' ")
+    List<String> selectPerCodeList(Integer userId);
+
+
+    @Select("select * from sys_user where usercode = #{userName}")
+    SysUser selectUserByCode(String userName);
+
+
+    @Select("select sp.id,sp.name as text, sp.url as href, sp.parentid as pid \n" +
+            "from sys_user_role sur,\n" +
+            "sys_role_permission srp,\n" +
+            "sys_permission sp \n" +
+            "where sur.sys_user_id=#{userId} and sur.sys_role_id=srp.sys_role_id \n" +
+            "and srp.sys_permission_id=sp.id\n" +
+            "and sp.parentid=#{id} and sp.type='menu'")
+    List<Tree> queryTreeList(Integer id,Integer userId);
+
+    @Select("select * from  t_user")
+    List<UserEntity> userList();
+
+
+    @Select("select * from t_user where userid = #{value}")
+    UserEntity toUserEdit(Integer userid);
+
+    @Update("UPDATE t_user SET username=#{username},userpassword=#{userpassword} " +
+            "WHERE userid = #{userid}")
+    void editUserBean(UserEntity user);
+
+    @Insert("INSERT INTO t_user (username,userpassword,userimage)" +
+            "VALUES(#{username},#{userpassword},#{userimage})")
+    @SelectKey( statement = "select last_insert_id()", keyProperty = "userid", before = false, resultType = Integer.class)
+    void addUserBean(UserEntity user);
+
+    @Delete("delete from t_user where userid = #{userid}")
+    void delete(Integer userid);
+
+    /*@Select("select * from t_tree where pid = #{id}")
     List<Tree> selectTree(Integer id);
 
     @Select("<script>SELECT t1.id,mecname,t3.name as meclevelname,t2.AREANAME as provincename,peopled,t1.name,status from t_info t1,t_area t2,t_level t3 where t1.provinceid = t2.AREAID and t1.meclevel = t3.id <if test='mecname != null and mecname.length >0'> and LOWER(mecname) like concat('%',#{mecname},'%')</if> limit #{page},#{rows} </script>")
@@ -35,5 +75,5 @@ public interface HelloMapper {
     List<Goods> selectGoodsList(Integer page, Integer rows);
 
     @Select("select count(1) from t_goods where 1=1")
-    Long selectGoodsTotal();
+    Long selectGoodsTotal();*/
 }
