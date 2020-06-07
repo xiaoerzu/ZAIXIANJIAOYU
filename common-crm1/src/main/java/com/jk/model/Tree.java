@@ -22,4 +22,6 @@ public class Tree implements Serializable {
 	
 	private Boolean leaf;
 
+	private Boolean checked;
+
 }

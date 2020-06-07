@@ -1,12 +1,11 @@
 package com.jk.service;
 
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient("provider-crm1")
 public interface HelloService {
@@ -24,38 +23,35 @@ public interface HelloService {
     @PostMapping("/queryTree")
     List<Tree> queryTree(@RequestParam("id") Integer id);
 
-    @GetMapping("/userList")
-    List<UserEntity> userList();
-
-    @RequestMapping("/toUserEdit")
-    UserEntity toUserEdit(@RequestParam("userid") Integer userid);
-
-    @RequestMapping("/editUserBean")
-    void editUserBean(@RequestBody UserEntity user);
-
-    @RequestMapping("/addUserBean")
-    void addUserBean(@RequestBody UserEntity user);
-
-    @GetMapping("/delete")
-    void delete(@RequestParam("userid") Integer userid);
-
-   /* @GetMapping("/hello")
-    String hello();
-
-    @RequestMapping("selectTree")
-    @ResponseBody
-    List<Tree> selectTree();
-
-    @PostMapping("selectList")
-    Map<String ,Object> selectList(@RequestParam("page") Integer page, @RequestParam("rows") Integer rows,@RequestParam("mecname") String mecname);
 
 
-    @PostMapping("/deleteInfo")
-    void deleteInfo(@RequestParam("id") Integer id);
+    @RequestMapping("initKeChengTable")
+    List<CourseEntity> initKeChengTable(@RequestBody CourseEntity course);
 
-    @RequestMapping("/updateInfoById")
-    Information updateInfoById(@RequestParam("id") Integer id);
+    @PostMapping("/deleteCourse")
+    void deleteCourse(@RequestParam("id") Integer id);
 
-    @PostMapping("selectGoodsList")
-    Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows);*/
+    @RequestMapping("/compileById")
+    CourseEntity compileById(@RequestParam("id") Integer id);
+
+    @PostMapping("/addKeCheng")
+    void addKeCheng(@RequestBody CourseEntity course);
+
+    @PostMapping("/editKeChengBean")
+    void editKeChengBean(@RequestBody CourseEntity course);
+
+    @RequestMapping("/inityongHuTable")
+    List<SysUser> inityongHuTable();
+
+    @RequestMapping("/initjueseTable")
+    List<Role> initjueseTable(@RequestParam("userid") Integer userid);
+
+    @RequestMapping("/addJueSe")
+    void addJueSe(@RequestParam("roleId") String roleId, @RequestParam("userId") Integer userId);
+
+    @RequestMapping("/initJueSeTable")
+    List<Role> initJueSeTable();
+
+    @RequestMapping("/queryTreeById")
+    List<Tree> queryTreeById(@RequestParam("roleId") Integer roleId);
 }

@@ -1,13 +1,15 @@
 package com.jk.service;
 
 import com.jk.mapper.HelloMapper;
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class HelloServiceImpl implements HelloService {
@@ -28,6 +30,7 @@ public class HelloServiceImpl implements HelloService {
         return helloMapper.selectUserByCode(userName);
     }
 
+
     @RequestMapping("/hello")
     @Override
     public String hello() {
@@ -41,24 +44,111 @@ public class HelloServiceImpl implements HelloService {
         return queryTreeByPid(1, userId);
     }
 
-    @GetMapping("/userList")
+    @RequestMapping("initKeChengTable")
     @Override
-    public List<UserEntity> userList() {
-        return helloMapper.userList();
+    public List<CourseEntity> initKeChengTable(@RequestBody CourseEntity course) {
+        return helloMapper.initKeChengTable(course);
     }
 
-    @RequestMapping("/toUserEdit")
+    @PostMapping("/deleteCourse")
     @Override
-    public UserEntity toUserEdit(@RequestParam("userid") Integer userid) {
-        return helloMapper.toUserEdit(userid);
+    public void deleteCourse(@RequestParam("id") Integer id) {
+        helloMapper.deleteCourse(id);
     }
 
-
-    @RequestMapping("/editUserBean")
+    @RequestMapping("/compileById")
     @Override
-    public void editUserBean(@RequestBody UserEntity user) {
-        helloMapper.editUserBean(user);
+    public CourseEntity compileById(@RequestParam("id") Integer id) {
+        return helloMapper.compileById(id);
     }
+
+    @PostMapping("/addKeCheng")
+    @Override
+    public void addKeCheng(@RequestBody CourseEntity course) {
+        helloMapper.addKeCheng(course);
+    }
+
+    @PostMapping("/editKeChengBean")
+    @Override
+    public void editKeChengBean(@RequestBody CourseEntity course) {
+        helloMapper.editKeChengBean(course);
+    }
+
+    @RequestMapping("/inityongHuTable")
+    @Override
+    public List<SysUser> inityongHuTable() {
+        return helloMapper.inityongHuTable();
+    }
+
+    @RequestMapping("/initjueseTable")
+    @Override
+    public List<Role> initjueseTable(@RequestParam("userid") Integer userid) {
+
+        List<Role> list = helloMapper.initjueseTable();
+        List<UserRole> urlist = helloMapper.queryUserRole(userid);
+
+        for (Role role : list) {
+
+            for (UserRole userRolerole : urlist) {
+
+                if(role.getId()==userRolerole.getSysroleid()){
+                    role.setSelections(true);
+                }
+            }
+
+        }
+
+        return list;
+    }
+
+    @RequestMapping("/addJueSe")
+    @Override
+    public void addJueSe(@RequestParam("roleId") String roleId, @RequestParam("userId") Integer userId) {
+
+        helloMapper.deleteJuese(userId);
+
+
+        String[] rid = roleId.split(",");
+        for (int i=0;i<rid.length;i++){
+            helloMapper.addJueSe(Integer.valueOf(String.valueOf(rid[i])),userId);
+        }
+
+    }
+
+    @RequestMapping("/initJueSeTable")
+    @Override
+    public List<Role> initJueSeTable() {
+        return helloMapper.initJueSeTable();
+    }
+
+    @RequestMapping("/queryTreeById")
+    @Override
+    public List<Tree> queryTreeById(@RequestParam("roleId") Integer roleId) {
+
+        List<Integer> roleIdList = helloMapper.queryTreeByRoleId(roleId);
+
+        List<Tree> list = queryTreeByUserRoleId(1,roleIdList);
+
+        return list;
+    }
+
+    private List<Tree> queryTreeByUserRoleId(Integer pid, List<Integer> roleIdList) {
+        List<Tree> treeList = helloMapper.queryAllTree(pid);
+
+        for (Tree tree : treeList) {
+            List<Tree> nodeList = queryTreeByUserRoleId(tree.getId(), roleIdList);
+            tree.setNodes(nodeList);
+            for (Integer treeId : roleIdList) {
+                if(nodeList.size() <= 0 && tree.getId() == treeId) {
+                    // 选中   两个集合遍历，获取两个集合中的相同数据称为交集
+                    tree.setChecked(true);
+                }
+            }
+        }
+        return treeList;
+
+    }
+
 
     private List<Tree> queryTreeByPid(int id, Integer userId) {
         List<Tree> treeList = helloMapper.queryTreeList(id, userId);
@@ -77,89 +167,5 @@ public class HelloServiceImpl implements HelloService {
     }
 
 
-    @RequestMapping("/addUserBean")
-    @Override
-    public void addUserBean(@RequestBody UserEntity user) {
-        helloMapper.addUserBean(user);
-    }
 
-    @GetMapping("/delete")
-    @Override
-    public void delete(@RequestParam("userid") Integer userid) {
-        helloMapper.delete(userid);
-    }
-
-    /*@GetMapping("/hello")
-    @Override
-    public String hello() {
-        return "调用成功";
-    }
-
-    @RequestMapping("selectTree")
-    @ResponseBody
-    @Override
-    public List<Tree> selectTree() {
-        return selectTreeNoode(-1);
-    }
-
-    @PostMapping("selectList")
-    @Override
-    public Map<String ,Object> selectList(@RequestParam("page") Integer page, @RequestParam("rows") Integer rows,@RequestParam("mecname") String mecname) {
-
-        Long total = helloMapper.selectTotal(mecname);
-
-        List<Information> list = helloMapper.selectList((page-1)*rows,rows,mecname);
-
-
-        Map<String,Object> map = new HashMap<String,Object>();
-
-        map.put("total",total);
-        map.put("rows",list);
-
-        return map;
-    }
-
-    @PostMapping("/deleteInfo")
-    @Override
-    public void deleteInfo(Integer id) {
-        helloMapper.deleteInfo(id);
-    }
-
-    @RequestMapping("/updateInfoById")
-    @Override
-    public Information updateInfoById(Integer id) {
-        return helloMapper.updateInfoById(id);
-    }
-
-    @PostMapping("selectGoodsList")
-    @Override
-    public Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows) {
-        Long total = helloMapper.selectGoodsTotal();
-
-        List<Goods> list = helloMapper.selectGoodsList((page-1)*rows,rows);
-
-
-        Map<String,Object> map = new HashMap<String,Object>();
-
-        map.put("total",total);
-        map.put("rows",list);
-
-        return map;
-    }
-
-    private List<Tree> selectTreeNoode(Integer id) {
-
-        List<Tree> treeList = helloMapper.selectTree(id);
-
-
-        for (Tree list:treeList) {
-            List<Tree> nodeList = selectTreeNoode(list.getId());
-            if(nodeList!=null && !nodeList.isEmpty()){
-                list.setNodes(nodeList);
-                list.setSelectable(true);
-            }
-            list.setSelectable(true);
-        }
-        return treeList;
-    }*/
 }

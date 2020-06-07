@@ -1,15 +1,12 @@
 package com.jk.mapper;
 
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface HelloMapper {
-
 
 
     @Select("select sp.percode \n" +
@@ -34,24 +31,57 @@ public interface HelloMapper {
             "and sp.parentid=#{id} and sp.type='menu'")
     List<Tree> queryTreeList(Integer id,Integer userId);
 
-    @Select("select * from  t_user")
-    List<UserEntity> userList();
 
+    @Select("<script> " +
+            "SELECT * FROM `1908_course`" +
+            " WHERE 1=1 " +
+            "<if test='coursetitle != null and coursetitle.length > 0'> " +
+            "and coursetitle like concat('%',#{coursetitle},'%') " +
+            "</if>"  +
+            "</script>")
+    List<CourseEntity> initKeChengTable(CourseEntity course);
 
-    @Select("select * from t_user where userid = #{value}")
-    UserEntity toUserEdit(Integer userid);
+    @Delete("delete from 1908_course where courseid = #{id}")
+    void deleteCourse(Integer id);
 
-    @Update("UPDATE t_user SET username=#{username},userpassword=#{userpassword} " +
-            "WHERE userid = #{userid}")
-    void editUserBean(UserEntity user);
+    @Select("select * from 1908_course where courseid = #{id}")
+    CourseEntity compileById(Integer id);
 
-    @Insert("INSERT INTO t_user (username,userpassword,userimage)" +
-            "VALUES(#{username},#{userpassword},#{userimage})")
-    @SelectKey( statement = "select last_insert_id()", keyProperty = "userid", before = false, resultType = Integer.class)
-    void addUserBean(UserEntity user);
+    @Insert("INSERT INTO 1908_course " +
+            "(coursetitle,coursetype,coursenumber,courseimg,authername,autherimg,courseprice,coursecontext) " +
+            "VALUES (#{coursetitle},#{coursetype},0,#{courseimg}," +
+            "#{authername},#{autherimg},#{courseprice},#{coursecontext})")
+    @SelectKey( statement = "select last_insert_id()", keyProperty = "courseid", before = false, resultType = Integer.class)
+    void addKeCheng(CourseEntity course);
 
-    @Delete("delete from t_user where userid = #{userid}")
-    void delete(Integer userid);
+    @Update("UPDATE 1908_course SET coursetitle=#{coursetitle},coursetype=#{coursetype}, " +
+            "courseimg=#{courseimg},authername=#{authername},courseprice=#{courseprice}, " +
+            "coursecontext=#{coursecontext}  WHERE courseid =#{courseid}")
+    void editKeChengBean(CourseEntity course);
+
+    @Select("select * from sys_user")
+    List<SysUser> inityongHuTable();
+
+    @Select("select * from sys_role")
+    List<Role> initjueseTable();
+
+    @Insert("insert into sys_user_role (sys_user_id,sys_role_id) values (#{userId},#{roleId})")
+    void addJueSe(Integer roleId, Integer userId);
+
+    @Select("select sys_user_id as sysuserid,sys_role_id as sysroleid from  sys_user_role where sys_user_id = #{userid}")
+    List<UserRole> queryUserRole(Integer userid);
+
+    @Delete("delete from sys_user_role where sys_user_id = #{userId}")
+    void deleteJuese(Integer userId);
+
+    @Select("select * from sys_role")
+    List<Role> initJueSeTable();
+
+    @Select("select sys_permission_id as syspermissionid from sys_role_permission where sys_role_id = #{roleId}")
+    List<Integer> queryTreeByRoleId(Integer roleId);
+
+    @Select("select sp.id as id,sp.name as text, sp.url as href, sp.parentid as pid from sys_permission sp where parentid = #{pid}")
+    List<Tree> queryAllTree(Integer pid);
 
     /*@Select("select * from t_tree where pid = #{id}")
     List<Tree> selectTree(Integer id);
