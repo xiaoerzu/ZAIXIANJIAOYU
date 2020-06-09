@@ -1,69 +1,203 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" th:href="@{css/bootstrap.css}" />
-    <link rel="stylesheet" th:href="@{css/bootstrap-table.css}" />
+
+    <!-- Metas -->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="" />
+    <!-- Links -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-table.css}">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="js/bootstrap3/css/bootstrap.css">
+    <script src="js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <link rel="stylesheet" href="js/bootstrap-treeview/bootstrap-treeview.min.css">
+    <script src="js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+    <link rel="stylesheet" href="js/bootStrap-addTabs/bootstrap.addtabs.css">
+
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="/js/bootbox/bootbox.js"></script>
 </head>
 <body>
-<br>
-<div class="col-sm-5">
-    <input type="text" class="form-control" th:id="coursetitle" name="coursetitle" placeholder="title"/>
+<div id="toolbar">
+    <form class="form-inline">
+        <div class="form-group">
+            <label class="col-sm-4 control-label">课程标题</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="coursetitle" placeholder="请输入课程标题" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-3">
+                <button type="button" onclick="search()" class="btn btn-info glyphicon glyphicon-search">搜索</button>
+            </div>
+        </div>
+    </form>
 </div>
-<button type="button" th:id="btn" class="btn btn-info glyphicon glyphicon-search">搜索</button>
-<br><br>
-<div  id="div1" th:fragment="div1">
-    <!--<a th:href="@{/toAdd}" class="btn btn-info" shiro:hasPermission="course:create">Add</a>
-    -->
-    <table id="datatable" class="table" >
-        <tr>
-            <th>ID</th>
-            <th>封面</th>
-            <th>课程标题</th>
-            <th>订阅数量</th>
-            <th>类型</th>
-            <th>作者</th>
-            <th>课程价格</th>
-            <th>课程内容</th>
-            <!-- <shiro:hasPermission name="goods:edit">-->
-            <th>Edit</th>
-            <!-- </shiro:hasPermission>-->
-            <th>delete</th>
-        </tr>
-        <tr th:each="course : ${courseList}">
-            <td th:text="${course.courseid}">
-            <td> <img th:src="@{${course.courseimg}}" th:height="120px" th:width="180px"/></td>
-            <td th:text="${course.coursetitle}"></td>
-            <td th:text="${course.coursenumber}"></td>
-            <td th:if="${course.coursetype==1}">课件</td>
-            <td th:if="${course.coursetype==2}">实战教程</td>
-            <td th:if="${course.coursetype==3}">demo</td>
-            <td th:if="${course.coursetype==4}">在线辅导</td>
-            <td th:if="${course.coursetype==5}">vip特惠礼包</td>
-            <td th:text="${course.authername}"></td>
-            <td th:text="${course.courseprice}+'￥'"></td>
-            <td th:text="${course.coursecontext}"></td>
-            <!--<shiro:hasPermission name="goods:edit">-->
-            <td>
-                <a th:href="@{/editKeCheng(courseid=${course.courseid})}">Edit</a>
-            </td>
-            <!--</shiro:hasPermission>-->
-            <td>
-                <a th:href="@{/remove(courseid=${course.courseid})}">删除</a>
-            </td>
-        </tr>
-    </table>
-</div>
+
+<button type="button" class="btn btn-info" onclick="addKeCheng()">新增课程</button>
+<table id="KeChengTable" class="table"></table>
+</body>
 <script>
-
-    $('#btn').click(function () {
-
-        var coursetitle = $("#coursetitle").val();
-        var url = '/toList?coursetitle='+coursetitle;
-        $('#div1').load(url);
+    $(function(){
+        initKeChengTable();
     })
+
+    function initKeChengTable(){
+        $("#KeChengTable").bootstrapTable({
+            url:'initKeChengTable',
+            toolbar:'#toolbar',
+            pagination:true, //是否展示分页
+            pageList:[10, 20, 50, 100],//分页组件
+            pageNumber:1,
+            pageSize:5,//默认每页条数
+            method:'post',
+            contentType:'application/x-www-form-urlencoded',//post请求按照表单方式
+            striped:true,//斑马线
+            sidePagination:'client',//分页方式：client客户端分页，server服务端分页（*
+            queryParams:function(){
+                return {
+                    page:this.pageNumber,
+                    rows:this.pageSize,
+                    coursetitle: $("#coursetitle").val(),
+                };
+            },
+            columns:[
+                {checkbox:true},
+                {field:'courseid',title:'编号'},
+                {field:'courseimg',title:'封面',
+                    formatter:function(value,row,index){
+                        return "<img src='"+value+"' width='50px' height='50px'> ";
+                    }
+                },
+                {field:'coursetitle',title:'标题'},
+                {field:'coursetype',title:'类型',
+                    formatter:function(value,row,index){
+                        str = "";
+                        if (value==1) {
+                            str+="课件";
+                        }
+                        if (value==2) {
+                            str+="实战教程";
+                        }
+                        if (value==3) {
+                            str+="demo";
+                        }
+                        if (value==4) {
+                            str+="在线辅导";
+                        }
+                        if (value==5) {
+                            str+="vip特惠礼包";
+                        }
+                        return str;
+                    }
+                },
+                {field:'coursenumber',title:'订阅数量'},
+                {field:'authername',title:'作者'},
+                {field:'courseprice',title:'价格'},
+                /*                {field:'autherimg',title:'视频',formatter:function(value,row,index){
+                                        /!*"<img src='"+value+"' width='60px' height='60px' />"*!/
+                                        return "<video src='"+value+"' controls=''  width='15%' height='5%'></video>";
+                                    }},*/
+                {field:'coursecontext',title:'内容'},
+                {field:'cz',title:'操作',width:$(this).width() * 0.2,
+                    formatter:function(value,row,index){
+                        return "<a href='javascript:deleteMusic("+row.courseid+")' class='btn btn-info' role='button'>删&nbsp;除</a>&nbsp;&nbsp;&nbsp;" +
+                            " <a href='javascript:compileMusic("+row.courseid+")' class='btn btn-success' role='button'>编&nbsp;辑</a>&nbsp;&nbsp;&nbsp;"
+                    }
+                }
+
+            ]
+        });
+    }
+    function search(){
+        $("#KeChengTable").bootstrapTable("refresh");
+    }
+
+
+    function deleteMusic(id) {
+
+        $.ajax({
+            url:"../deleteCourse",
+            type:"post",
+            data:{id:id},
+            success:function(data) {
+
+                if(data >= 0){
+                    alert("删除成功！！！");
+                    $("#KeChengTable").bootstrapTable('refresh');
+                }else{
+                    alert("删除失败！！！");
+                }
+            }
+        })
+    }
+
+    function compileMusic(id) {
+
+        location.href="../compileById?id="+id;
+    }
+
+    //新增弹框
+    var res;
+    function createAddContent(url) {
+        $.ajax({
+            url: url,
+            async: false,
+            success: function (data) {
+                res = data;
+            }
+        });
+        return res;
+    }
+
+    //新增
+    function addKeCheng(){
+        //打开新增弹框
+        bootbox.dialog({
+            title: '新增课程',
+            message: createAddContent("toAddKeCheng"),
+            closeButton: true,//是否显示关闭按钮
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+
+                        $.ajax({
+                            url: 'addKeCheng',
+                            type: 'post',
+                            cache: false,
+                            data: $("#KeChengform").serialize(),
+                            dataType: "json",
+                            success: function () {
+                                alert("新增成功");
+                                //刷新表格
+                                $("#KeChengTable").bootstrapTable("refresh");
+
+                            }
+                        });
+                        location.href=location
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+                }
+            }
+        });
+    }
+
+
 
 </script>
 </body>

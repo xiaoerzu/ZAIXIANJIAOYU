@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- Metas -->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="" />
+    <!-- Links -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-table.css}">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="js/bootstrap3/css/bootstrap.css">
+    <script src="js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <link rel="stylesheet" href="js/bootstrap-treeview/bootstrap-treeview.min.css">
+    <script src="js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+    <link rel="stylesheet" href="js/bootStrap-addTabs/bootstrap.addtabs.css">
+
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="/js/bootbox/bootbox.js"></script>
+</head>
+<body>
+
+
+<button type="button" class="btn btn-info" onclick="addMuLu()">添加</button>
+<table id="muluTable" class="table"></table>
+</body>
+<script>
+    $(function(){
+        initMuLuTable();
+    })
+
+    function initMuLuTable(){
+        $("#muluTable").bootstrapTable({
+            url:'initMuLuTable',
+            toolbar:'#toolbar',
+            pagination:true, //是否展示分页
+            pageList:[10, 20, 50, 100],//分页组件
+            pageNumber:1,
+            pageSize:5,//默认每页条数
+            method:'post',
+            contentType:'application/x-www-form-urlencoded',//post请求按照表单方式
+            striped:true,//斑马线
+            sidePagination:'client',//分页方式：client客户端分页，server服务端分页（*
+            queryParams:function(){
+                return {
+                    page:this.pageNumber,
+                    rows:this.pageSize,
+                };
+            },
+            columns:[
+                {checkbox:true},
+                {field:'id',title:'编号'},
+                {field:'sectionname',title:'章节目录'},
+                {field:'video',title:'视频',formatter:function(value,row,index){
+                        return "<video src='"+value+"' controls=''  width='25%' height='20%'></video>";
+                    }},
+
+                {field:'cz',title:'操作',
+                    formatter:function(value,row,index){
+                        return "<a href='javascript:deleteSection("+row.id+")' class='btn btn-info' role='button'>删&nbsp;除</a>"
+
+                    }
+                }
+
+            ]
+        });
+    }
+
+
+    function deleteSection(id) {
+
+        $.ajax({
+            url:"deleteSection",
+            type:"post",
+            data:{id:id},
+            success:function(data) {
+                if(data >= 0){
+                    alert("删除成功！！！");
+                    $("#muluTable").bootstrapTable('refresh');
+                }else{
+                    alert("删除失败！！！");
+                }
+            }
+        })
+    }
+
+    //新增弹框
+    var res;
+    function createAddContent(url) {
+        $.ajax({
+            url: url,
+            async: false,
+            success: function (data) {
+                res = data;
+            }
+        });
+        return res;
+    }
+
+
+    //新增
+    function addMuLu(){
+        //打开新增弹框
+        bootbox.dialog({
+            title: '新增',
+            message: createAddContent("toAddMuLu"),
+            closeButton: true,//是否显示关闭按钮
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+
+                        $.ajax({
+                            url: 'addMuLu',
+                            type: 'post',
+                            cache: false,
+                            data: $("#MuLuform").serialize(),
+                            dataType: "json",
+                            success: function () {
+                                alert("新增成功");
+                                //刷新表格
+                                $("#muluTable").bootstrapTable("refresh");
+                            }
+                        });
+                        location.href=location
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
+</script>
+</html>

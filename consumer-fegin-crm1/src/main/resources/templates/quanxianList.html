@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-1.9.1.min.js"></script>
+    <script src="../js/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap3/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../js/bootstrap-treeview/bootstrap-treeview.min.css">
+    <script src="../js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <link rel="stylesheet" href="../js/bootStrap-addTabs/bootstrap.addtabs.css">
+    <script src="../js/bootStrap-addTabs/bootstrap.addtabs.min.js"></script>
+</head>
+<body>
+
+<input type="hidden" name="id" id="rid" th:value="${roleId}" />
+
+<div class="container-fluid" style="margin-top: 20px;">
+
+    <div class="row">
+        <div class="col-xs-6">
+            <div id="searchTree"></div>
+        </div>
+
+    </div>
+
+    <button type="button" class="btn btn-info" onclick="addRolePer()">保存</button>
+</div>
+<script type="text/javascript">
+
+    $(function(){
+        initTree();
+    });
+
+    var rid = $("#rid").val();
+
+    function initTree(){
+        $.ajax({
+            url: "../queryTreeById?roleId="+rid,
+            type: "post",
+            dataType: "json",
+            success: function(data){
+
+               $('#searchTree').treeview({
+                    showCheckbox: true,
+                    data: data,
+                    onNodeChecked: nodeChecked,
+                    onNodeUnchecked: nodeUnchecked
+                });
+
+            }
+        })
+    }
+
+
+    var nodeCheckedSilent = false;
+
+    function nodeChecked(event, node) {
+        if (nodeCheckedSilent) {
+            return;
+        }
+        nodeCheckedSilent = true;
+        checkAllParent(node);
+        checkAllSon(node);
+
+        nodeCheckedSilent = false;
+    }
+
+    var nodeUncheckedSilent = false;
+
+    function nodeUnchecked(event, node) {
+        if (nodeUncheckedSilent)
+            return;
+        nodeUncheckedSilent = true;
+        uncheckAllParent(node);
+        uncheckAllSon(node);
+        nodeUncheckedSilent = false;
+    }
+
+    //选中全部父节点
+    function checkAllParent(node) {
+        $('#searchTree').treeview('checkNode', node.nodeId, {
+            silent: true
+        });
+        var parentNode = $('#searchTree').treeview('getParent', node.nodeId);
+        if (!("nodeId" in parentNode)) {
+            return;
+        } else {
+            checkAllParent(parentNode);
+        }
+    }
+    //取消全部父节点
+    function uncheckAllParent(node) {
+        $('#searchTree').treeview('uncheckNode', node.nodeId, {
+            silent: true
+        });
+        var siblings = $('#searchTree').treeview('getSiblings', node.nodeId);
+        var parentNode = $('#searchTree').treeview('getParent', node.nodeId);
+        if (!("nodeId" in parentNode)) {
+            return;
+        }
+        var isAllUnchecked = true; //是否全部没选中
+        for (var i in siblings) {
+            if (siblings[i].state.checked) {
+                isAllUnchecked = false;
+                break;
+            }
+        }
+        if (isAllUnchecked) {
+            uncheckAllParent(parentNode);
+        }
+
+    }
+
+
+    //级联选中所有子节点
+    function checkAllSon(node) {
+        $('#searchTree').treeview('checkNode', node.nodeId, {
+            silent: true
+        });
+
+        if (node.nodes != null && node.nodes.length > 0) {
+            for (var i in node.nodes) {
+                checkAllSon(node.nodes[i]);
+            }
+        }
+
+    }
+    //级联取消所有子节点
+    function uncheckAllSon(node) {
+        $('#searchTree').treeview('uncheckNode', node.nodeId, {
+            silent: true
+        });
+        if (node.nodes != null && node.nodes.length > 0) {
+            for (var i in node.nodes) {
+                uncheckAllSon(node.nodes[i]);
+            }
+        }
+    }
+
+
+
+    function addRolePer() {
+
+        var aaaa = $('#searchTree').treeview("getChecked");
+
+        var str = "";
+        for (var i= 0; i< aaaa.length; i++) {
+            str += ","+aaaa[i].id;
+        }
+        var ids = str.substring(1);
+
+        $.ajax({
+            url: 'addRolePer',
+            type: 'post',
+            cache: false,
+            data: {permissionIds:ids,roleId:rid},
+            dataType: "json",
+            success: function () {
+                alert("新增成功");
+                //刷新表格
+                $("#JueSeTable").bootstrapTable("refresh");
+
+                //window.history.back();
+            }
+        });
+        location.href=location
+
+    }
+
+</script>
+</body>
+</html>

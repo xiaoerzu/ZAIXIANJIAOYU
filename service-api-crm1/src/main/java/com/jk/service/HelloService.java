@@ -1,8 +1,6 @@
 package com.jk.service;
 
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,8 +8,6 @@ import java.util.List;
 
 @FeignClient("provider-crm1")
 public interface HelloService {
-
-
     @RequestMapping("selectPerCodeList")
     List<String> selectPerCodeList(@RequestParam("userId") Integer userId);
 
@@ -24,38 +20,88 @@ public interface HelloService {
     @PostMapping("/queryTree")
     List<Tree> queryTree(@RequestParam("id") Integer id);
 
-    @GetMapping("/userList")
-    List<UserEntity> userList();
 
-    @RequestMapping("/toUserEdit")
-    UserEntity toUserEdit(@RequestParam("userid") Integer userid);
+    @RequestMapping("initKeChengTable")
+    List<CourseEntity> initKeChengTable(@RequestBody CourseEntity course);
 
-    @RequestMapping("/editUserBean")
-    void editUserBean(@RequestBody UserEntity user);
+    @RequestMapping("initMyChart3")
+    List<StatementBean> initMyChart3();
 
-    @RequestMapping("/addUserBean")
-    void addUserBean(@RequestBody UserEntity user);
+    @RequestMapping("initMyChart2")
+    StatementBean initMyChart2();
 
-    @GetMapping("/delete")
-    void delete(@RequestParam("userid") Integer userid);
+    @RequestMapping("initMyChart1")
+    List<StatementBean> initMyChart1();
 
-   /* @GetMapping("/hello")
-    String hello();
+    @RequestMapping("initSlideshowTable")
+    List<SlideshowBean> initSlideshowTable();
 
-    @RequestMapping("selectTree")
-    @ResponseBody
-    List<Tree> selectTree();
+    @RequestMapping("pishan1")
+    void pishan1(@RequestParam String id);
 
-    @PostMapping("selectList")
-    Map<String ,Object> selectList(@RequestParam("page") Integer page, @RequestParam("rows") Integer rows,@RequestParam("mecname") String mecname);
+    @RequestMapping("addSlideshow")
+    void addSlideshow(@RequestBody SlideshowBean slideshow);
+
+    @RequestMapping("findInfoById")
+    SlideshowBean findInfoById(@RequestParam Integer id);
 
 
-    @PostMapping("/deleteInfo")
-    void deleteInfo(@RequestParam("id") Integer id);
 
-    @RequestMapping("/updateInfoById")
-    Information updateInfoById(@RequestParam("id") Integer id);
 
-    @PostMapping("selectGoodsList")
-    Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows);*/
+
+    @PostMapping("/deleteCourse")
+    void deleteCourse(@RequestParam("id") Integer id);
+
+    @RequestMapping("/compileById")
+    CourseEntity compileById(@RequestParam("id") Integer id);
+
+    @PostMapping("/addKeCheng")
+    void addKeCheng(@RequestBody CourseEntity course);
+
+    @PostMapping("/editKeChengBean")
+    void editKeChengBean(@RequestBody CourseEntity course);
+
+    @RequestMapping("/inityongHuTable")
+    List<SysUser> inityongHuTable();
+
+
+    @RequestMapping("/initJueSeTable")
+    List<Role> initJueSeTable();
+
+
+
+    @RequestMapping("initOrderTable")
+    List<Order> initOrderTable(@RequestBody Order order);
+
+    @PostMapping("/deleteOrder")
+    void deleteOrder(@RequestParam("id") Integer id);
+
+    @RequestMapping("initMuLuTable")
+    List<SectionBean> initMuLuTable();
+
+    @PostMapping("/deleteSection")
+    void deleteSection(@RequestParam("id")Integer id);
+
+
+    @RequestMapping("/addJueSe")
+    void addJueSe(@RequestParam("roleId") String roleId, @RequestParam("userId") Integer userId);
+
+    @RequestMapping("/queryTreeById")
+    List<Tree> queryTreeById(@RequestParam("roleId") Integer roleId);
+
+    @PostMapping("/addJueSeList")
+    void addJueSeList(@RequestBody Role role);
+
+    @RequestMapping("/initjueseTable")
+    List<Role> initjueseTable(@RequestParam("userid") Integer userid);
+
+    @PostMapping("/deleteRole")
+    void deleteRole(@RequestParam("id") Integer id);
+
+
+    @PostMapping("/addRolePer")
+    void addRolePer(@RequestParam("permissionIds") String permissionIds, @RequestParam("roleId") Integer roleId);
+
+    @PostMapping("/addMuLu")
+    void addMuLu(@RequestBody SectionBean section);
 }

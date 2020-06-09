@@ -1,0 +1,7 @@
+com\jk\model\Order.class
+com\jk\model\SysUser.class
+com\jk\model\Tree.class
+com\jk\model\CourseEntity.class
+com\jk\model\TypeEntity.class
+com\jk\model\UserEntity.class
+com\jk\model\ShoppingEntity.class

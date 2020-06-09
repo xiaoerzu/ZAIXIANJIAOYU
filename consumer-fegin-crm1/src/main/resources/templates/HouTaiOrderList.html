@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Metas -->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="" />
+    <!-- Links -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-table.css}">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="js/bootstrap3/css/bootstrap.css">
+    <script src="js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <link rel="stylesheet" href="js/bootstrap-treeview/bootstrap-treeview.min.css">
+    <script src="js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+    <link rel="stylesheet" href="js/bootStrap-addTabs/bootstrap.addtabs.css">
+
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="/js/bootbox/bootbox.js"></script>
+
+</head>
+<body>
+<div id="toolbar">
+    <form class="form-inline">
+        <div class="form-group">
+            <label class="col-sm-4 control-label">订单编号</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="ordernumber" placeholder="请输入订单编号" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-3">
+                <button type="button" onclick="search()" class="btn btn-info glyphicon glyphicon-search">搜索</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<table id="orderTable" class="table"></table>
+</body>
+<script>
+    $(function(){
+        initOrderTable();
+    })
+
+    function initOrderTable(){
+        $("#orderTable").bootstrapTable({
+            url:'initOrderTable',
+            toolbar:'#toolbar',
+            pagination:true, //是否展示分页
+            pageList:[10, 20, 50, 100],//分页组件
+            pageNumber:1,
+            pageSize:5,//默认每页条数
+            method:'post',
+            contentType:'application/x-www-form-urlencoded',//post请求按照表单方式
+            striped:true,//斑马线
+            sidePagination:'client',//分页方式：client客户端分页，server服务端分页（*
+            queryParams:function(){
+                return {
+                    page:this.pageNumber,
+                    rows:this.pageSize,
+                    ordernumber: $("#ordernumber").val(),
+                };
+            },
+            columns:[
+                {checkbox:true},
+                {field:'orderid',title:'编号'},
+                {field:'ordernumber',title:'订单编号'},
+                {field:'orderdate',title:'订单时间',
+                    formatter:function(value,row,index){
+                        return new Date(value);
+                    }
+                },
+                {field:'ordertitle',title:'标题'},
+                {field:'orderprice',title:'价格'},
+                {field:'username',title:'用户名'},
+                {field:'status',title:'状态',
+                    formatter:function(value,row,index){
+                        return value == 1?"未付款":"已付款";
+                    }
+                },
+                {field:'cz',title:'操作',width:$(this).width() * 0.2,
+                    formatter:function(value,row,index){
+                        return "<a href='javascript:deleteMusic("+row.orderid+")' class='btn btn-info' role='button'>删&nbsp;除</a>&nbsp;&nbsp;&nbsp;"
+                    }
+                }
+
+            ]
+        });
+    }
+    function search(){
+        $("#orderTable").bootstrapTable("refresh");
+    }
+
+
+    function deleteMusic(id) {
+
+        $.ajax({
+            url:"../deleteOrder",
+            type:"post",
+            data:{id:id},
+            success:function(data) {
+
+                if(data >= 0){
+                    alert("删除成功！！！");
+                    $("#orderTable").bootstrapTable('refresh');
+                }else{
+                    alert("删除失败！！！");
+                }
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>

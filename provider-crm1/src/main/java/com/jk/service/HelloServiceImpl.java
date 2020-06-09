@@ -1,17 +1,16 @@
 package com.jk.service;
 
 import com.jk.mapper.HelloMapper;
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class HelloServiceImpl implements HelloService {
-
 
     @Resource
     private HelloMapper helloMapper;
@@ -28,6 +27,7 @@ public class HelloServiceImpl implements HelloService {
         return helloMapper.selectUserByCode(userName);
     }
 
+
     @RequestMapping("/hello")
     @Override
     public String hello() {
@@ -41,24 +41,54 @@ public class HelloServiceImpl implements HelloService {
         return queryTreeByPid(1, userId);
     }
 
-    @GetMapping("/userList")
+    @RequestMapping("initKeChengTable")
     @Override
-    public List<UserEntity> userList() {
-        return helloMapper.userList();
+    public List<CourseEntity> initKeChengTable(@RequestBody CourseEntity course) {
+        return helloMapper.initKeChengTable(course);
     }
 
-    @RequestMapping("/toUserEdit")
+    @PostMapping("/deleteCourse")
     @Override
-    public UserEntity toUserEdit(@RequestParam("userid") Integer userid) {
-        return helloMapper.toUserEdit(userid);
+    public void deleteCourse(@RequestParam("id") Integer id) {
+        helloMapper.deleteCourse(id);
+    }
+
+    @RequestMapping("/compileById")
+    @Override
+    public CourseEntity compileById(@RequestParam("id") Integer id) {
+        return helloMapper.compileById(id);
+    }
+
+    @PostMapping("/addKeCheng")
+    @Override
+    public void addKeCheng(@RequestBody CourseEntity course) {
+        helloMapper.addKeCheng(course);
+    }
+
+    @PostMapping("/editKeChengBean")
+    @Override
+    public void editKeChengBean(@RequestBody CourseEntity course) {
+        helloMapper.editKeChengBean(course);
+    }
+
+    @RequestMapping("/inityongHuTable")
+    @Override
+    public List<SysUser> inityongHuTable() {
+        return helloMapper.inityongHuTable();
     }
 
 
-    @RequestMapping("/editUserBean")
+
+
+    @RequestMapping("/initJueSeTable")
     @Override
-    public void editUserBean(@RequestBody UserEntity user) {
-        helloMapper.editUserBean(user);
+    public List<Role> initJueSeTable() {
+        return helloMapper.initJueSeTable();
     }
+
+
+
+
 
     private List<Tree> queryTreeByPid(int id, Integer userId) {
         List<Tree> treeList = helloMapper.queryTreeList(id, userId);
@@ -77,89 +107,182 @@ public class HelloServiceImpl implements HelloService {
     }
 
 
-    @RequestMapping("/addUserBean")
+
+
+
+
+    @RequestMapping("initMyChart3")
     @Override
-    public void addUserBean(@RequestBody UserEntity user) {
-        helloMapper.addUserBean(user);
+    public List<StatementBean> initMyChart3() {
+
+        return helloMapper.MyChart3();
     }
 
-    @GetMapping("/delete")
+    @RequestMapping("initMyChart2")
     @Override
-    public void delete(@RequestParam("userid") Integer userid) {
-        helloMapper.delete(userid);
+    public StatementBean initMyChart2() {
+        return helloMapper.initMyChart2();
     }
 
-    /*@GetMapping("/hello")
+    @RequestMapping("initMyChart1")
     @Override
-    public String hello() {
-        return "调用成功";
+    public List<StatementBean> initMyChart1() {
+        System.out.println(helloMapper.initMyChart1()+"----s");
+        return helloMapper.initMyChart1();
     }
 
-    @RequestMapping("selectTree")
-    @ResponseBody
+    @RequestMapping("initSlideshowTable")
     @Override
-    public List<Tree> selectTree() {
-        return selectTreeNoode(-1);
+    public List<SlideshowBean> initSlideshowTable() {
+        return helloMapper.initSlideshowTable();
     }
 
-    @PostMapping("selectList")
+    @RequestMapping("pishan1")
     @Override
-    public Map<String ,Object> selectList(@RequestParam("page") Integer page, @RequestParam("rows") Integer rows,@RequestParam("mecname") String mecname) {
-
-        Long total = helloMapper.selectTotal(mecname);
-
-        List<Information> list = helloMapper.selectList((page-1)*rows,rows,mecname);
-
-
-        Map<String,Object> map = new HashMap<String,Object>();
-
-        map.put("total",total);
-        map.put("rows",list);
-
-        return map;
+    public void pishan1(String id) {
+        helloMapper.pishan1(id);
     }
 
-    @PostMapping("/deleteInfo")
+    @RequestMapping("addSlideshow")
     @Override
-    public void deleteInfo(Integer id) {
-        helloMapper.deleteInfo(id);
+    public void addSlideshow(@RequestBody SlideshowBean slideshow) {
+        helloMapper.addSlideshow(slideshow);
     }
 
-    @RequestMapping("/updateInfoById")
+    @RequestMapping("findInfoById")
     @Override
-    public Information updateInfoById(Integer id) {
-        return helloMapper.updateInfoById(id);
+    public SlideshowBean findInfoById(Integer id) {
+
+        return helloMapper.findInfoById(id);
     }
 
-    @PostMapping("selectGoodsList")
+    @RequestMapping("initOrderTable")
     @Override
-    public Map<String, Object> selectGoodsList(@RequestParam("page")Integer page, @RequestParam("rows")Integer rows) {
-        Long total = helloMapper.selectGoodsTotal();
-
-        List<Goods> list = helloMapper.selectGoodsList((page-1)*rows,rows);
-
-
-        Map<String,Object> map = new HashMap<String,Object>();
-
-        map.put("total",total);
-        map.put("rows",list);
-
-        return map;
+    public List<Order> initOrderTable(@RequestBody Order order) {
+        System.out.println( helloMapper.initOrderTable(order)+"---");
+        return helloMapper.initOrderTable(order);
     }
 
-    private List<Tree> selectTreeNoode(Integer id) {
+    @PostMapping("/deleteOrder")
+    @Override
+    public void deleteOrder(@RequestParam("id") Integer id) {
+        helloMapper.deleteOrder(id);
+    }
 
-        List<Tree> treeList = helloMapper.selectTree(id);
+    @RequestMapping("initMuLuTable")
+    @Override
+    public List<SectionBean> initMuLuTable() {
+        return helloMapper.initMuLuTable();
+    }
 
+    @Override
+    public void deleteSection(@RequestParam("id") Integer id) {
+        helloMapper.deleteSection(id);
+    }
 
-        for (Tree list:treeList) {
-            List<Tree> nodeList = selectTreeNoode(list.getId());
-            if(nodeList!=null && !nodeList.isEmpty()){
-                list.setNodes(nodeList);
-                list.setSelectable(true);
+    @RequestMapping("/initjueseTable")
+    @Override
+    public List<Role> initjueseTable(@RequestParam("userid") Integer userid) {
+
+        List<Role> list = helloMapper.initjueseTable();
+        List<UserRole> urlist = helloMapper.queryUserRole(userid);
+
+        for (Role role : list) {
+
+            for (UserRole userRolerole : urlist) {
+
+                if(role.getId()==userRolerole.getSysroleid()){
+                    role.setSelections(true);
+                }
             }
-            list.setSelectable(true);
+
+        }
+
+        return list;
+    }
+
+    @RequestMapping("/addJueSe")
+    @Override
+    public void addJueSe(@RequestParam("roleId") String roleId, @RequestParam("userId") Integer userId) {
+
+        helloMapper.deleteJuese(userId);
+
+
+        String[] rid = roleId.split(",");
+        for (int i=0;i<rid.length;i++){
+
+            helloMapper.addJueSe(Integer.valueOf(String.valueOf(rid[i])),userId);
+        }
+
+    }
+
+
+    @RequestMapping("/queryTreeById")
+    @Override
+    public List<Tree> queryTreeById(@RequestParam("roleId") Integer roleId) {
+
+        List<Integer> roleIdList = helloMapper.queryTreeByRoleId(roleId);
+
+        List<Tree> list = queryTreeByUserRoleId(1,roleIdList);
+
+        return list;
+    }
+
+
+    @PostMapping("/addJueSeList")
+    @Override
+    public void addJueSeList(@RequestBody Role role) {
+        helloMapper.addJueSeList(role);
+    }
+
+    @PostMapping("/deleteRole")
+    @Override
+    public void deleteRole(@RequestParam("id") Integer id) {
+        helloMapper.deleteRole(id);
+    }
+
+
+    @PostMapping("/addRolePer")
+    @Override
+    public void addRolePer(@RequestParam("permissionIds") String permissionIds, @RequestParam("roleId") Integer roleId) {
+
+        helloMapper.deleteRolePer(roleId);
+
+        String[] rid = permissionIds.split(",");
+        for (int i=0;i<rid.length;i++){
+
+            helloMapper.addRolePer(Integer.valueOf(String.valueOf(rid[i])),roleId);
+        }
+
+    }
+
+    @PostMapping("/addMuLu")
+    @Override
+    public void addMuLu(SectionBean section) {
+        helloMapper.addMuLu(section);
+    }
+
+    private List<Tree> queryTreeByUserRoleId(Integer pid, List<Integer> roleIdList) {
+        List<Tree> treeList = helloMapper.queryAllTree(pid);
+
+        for (Tree tree : treeList) {
+            List<Tree> nodeList = queryTreeByUserRoleId(tree.getId(), roleIdList);
+            tree.setNodes(nodeList);
+            for (Integer treeId : roleIdList) {
+                if(nodeList.size() <= 0 && tree.getId() == treeId) {
+                    // 选中   两个集合遍历，获取两个集合中的相同数据称为交集
+
+                    Map<String,Boolean> map = new HashMap<>();
+                    map.put("checked",true);
+                    tree.setState(map);
+                }
+            }
         }
         return treeList;
-    }*/
+
+    }
+
+
+
+
 }

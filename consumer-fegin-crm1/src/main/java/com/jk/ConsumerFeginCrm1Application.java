@@ -15,5 +15,5 @@ public class ConsumerFeginCrm1Application {
         SpringApplication.run(ConsumerFeginCrm1Application.class, args);
     }
 
-
 }
+

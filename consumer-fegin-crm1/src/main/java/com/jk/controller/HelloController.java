@@ -1,9 +1,8 @@
 package com.jk.controller;
 
-import com.jk.model.SysUser;
-import com.jk.model.Tree;
-import com.jk.model.UserEntity;
+import com.jk.model.*;
 import com.jk.service.HelloService;
+import com.jk.utils.FileUtil;
 import jdk.nashorn.internal.ir.annotations.Reference;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -14,21 +13,24 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class HelloController {
-
     @Reference
     private HelloService helloService;
 
     public HelloController(HelloService helloService) {
         this.helloService = helloService;
     }
-
 
     @Bean(name="helloService")
     public HelloService helloService(){
@@ -44,9 +46,7 @@ public class HelloController {
     //后台登录
     @PostMapping("/login")
     @ResponseBody
-    public String login(SysUser user){
-
-        // 拿到subject对象 调用login方法 跳转到realm对象认证方法中
+    public String login(SysUser user){// 拿到subject对象 调用login方法 跳转到realm对象认证方法中
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken upt = new UsernamePasswordToken(user.getUsercode(), user.getPassword());
 
@@ -80,126 +80,330 @@ public class HelloController {
     public List<Tree> queryTree(){
         Subject subject = SecurityUtils.getSubject();
         SysUser user = (SysUser)subject.getPrincipal();
-        System.out.println(user);
         return helloService.queryTree(user.getId());
     }
 
+//-----------------------1---------------------------------------------------------------
 
 
-    //查询用户表
-    @GetMapping("/userList")
-    @RequiresPermissions("user:create")
-    public ModelAndView userList(){
-        return new ModelAndView("HouTaiYongHuList", "userList", helloService.userList());
+    //数据统计  跳转
+    @GetMapping("/graph")
+    @RequiresPermissions("bk:query")
+    public String graph(){
+        return "echarts";
+    }
+
+    //条形图  统计
+    @RequestMapping("initMyChart3")
+    @ResponseBody
+    public List<StatementBean> initMyChart3(){
+
+        return helloService.initMyChart3();
+    }
+
+    //饼型图 统计
+    @RequestMapping("initMyChart2")
+    @ResponseBody
+    public StatementBean initMyChart2(){
+
+        return helloService.initMyChart2();
+    }
+
+    //柱型图 统计
+    @RequestMapping("initMyChart1")
+    @ResponseBody
+    public List<StatementBean> initMyChart1(){
+        return helloService.initMyChart1();
+    }
+
+    //轮播图管理  跳转
+    @GetMapping("/slideshow")
+    @RequiresPermissions("course:slideshow")
+    public String slideshow(){
+        return "slideshow";
+    }
+
+    //轮播图  查询  分页
+    @RequestMapping("initSlideshowTable")
+    @ResponseBody
+    public List<SlideshowBean> initSlideshowTable(){
+
+        return helloService.initSlideshowTable();
+    }
+
+    //轮播图 新增跳转
+    @RequestMapping("toAddSlideshow")
+    public String toAddSlideshow(){
+        return "addSlideshow";
+    }
+
+    //轮播图 删除
+    @RequestMapping("pishan1")
+    @ResponseBody
+    public String pishan1(String id){
+        helloService.pishan1(id);
+        return "1";
+    }
+
+    //回显图片  lubotu
+    @RequestMapping("upload")
+    @ResponseBody
+    private Map upload(MultipartFile file, HttpServletRequest request){
+        HashMap<String, Object> hashMap = new HashMap<>();
+        String fileUpload = FileUtil.FileUpload(file, request);
+        hashMap.put("img", fileUpload);
+        return hashMap;
+    }
+
+    //轮播图 新增
+    @RequestMapping("addSlideshow")
+    @ResponseBody
+    public void addSlideshow(SlideshowBean slideshow){
+        helloService.addSlideshow(slideshow);
+    }
+
+    //---------------------------------------liqinyang
+    //跳转新增角色
+    @GetMapping("/toaddJuese")
+    public String toaddJuese(){
+        return "addJuese";
+    }
+
+    //新增角色
+    @PostMapping("/addJueSeList")
+    @ResponseBody
+    public void addJueSeList(Role role){
+
+        //role.setSelections(false);
+        helloService.addJueSeList(role);
+    }
+
+    //删除角色
+    @PostMapping("/deleteRole")
+    @ResponseBody
+    public void deleteRole(Integer id){
+        helloService.deleteRole(id);
+    }
+
+    //查询角色
+    @RequestMapping("/initjueseTable")
+    @ResponseBody
+    public List<Role> initjueseTable(Integer userid){
+
+        List<Role>  list = helloService.initjueseTable(userid);
+        return list;
+
     }
 
 
-    //用户修改跳转
-    @GetMapping("/editYongHu")
-    @RequiresPermissions("user:edit")
-    public ModelAndView toEdit(Integer userid){
+
+
+
+    //跳转课程查询
+    @GetMapping("list")
+    @RequiresPermissions("course:query")
+    public String list(){
+        return "HouTaiKeChengList";
+    }
+    //课程条查  查询  分页
+    @RequestMapping("initKeChengTable")
+    @ResponseBody
+    public List<CourseEntity> initKeChengTable(CourseEntity course){
+
+        return helloService.initKeChengTable(course);
+    }
+
+    //跳转课程查询
+    @GetMapping("/user")
+    @RequiresPermissions("user:query")
+    public String user(){
+        return "HouTaiYongHuList";
+    }
+
+    //跳转角色查询
+    @GetMapping("/role")
+    @RequiresPermissions("user:query")
+    public String role(){
+        return "HouTaiJueSeList";
+    }
+
+
+    @RequestMapping("/inityongHuTable")
+    @ResponseBody
+    public List<SysUser> inityongHuTable(){
+        return helloService.inityongHuTable();
+    }
+
+
+
+    @PostMapping("/deleteCourse")
+    @ResponseBody
+    public void deleteCourse(Integer id){
+        helloService.deleteCourse(id);
+    }
+
+    @RequestMapping("/compileById")
+    @ResponseBody
+    public ModelAndView compileById(Integer id){
+        CourseEntity course = helloService.compileById(id);
+
         ModelAndView mav = new ModelAndView();
-        mav.addObject("userid",userid);//传值
-        mav.setViewName("editYongHu");//返回页面
+        mav.addObject("course",course);
+        mav.setViewName("editKeCheng");
+
+        return mav;
+    }
+
+    @RequestMapping("/toAddKeCheng")
+    public String toAddKeCheng(){
+
+        return "addKeCheng";
+    }
+
+
+    @PostMapping("/addKeCheng")
+    @ResponseBody
+    public void addKeCheng(CourseEntity course){
+
+        helloService.addKeCheng(course);
+    }
+
+
+
+    @PostMapping("/editKeChengBean")
+    @ResponseBody
+    public void editKeChengBean(CourseEntity course){
+        helloService.editKeChengBean(course);
+    }
+
+
+    @RequestMapping("/queryTreeById")
+    @ResponseBody
+    public List<Tree> queryTreeById(Integer roleId){
+        return helloService.queryTreeById(roleId);
+    }
+
+    @RequestMapping("/initJueSeTable")
+    @ResponseBody
+    public List<Role> initJueSeTable(){
+        return helloService.initJueSeTable();
+    }
+
+
+    @PostMapping("/addRolePer")
+    @ResponseBody
+    public void addRolePer(String permissionIds,Integer roleId){
+
+        helloService.addRolePer(permissionIds,roleId);
+
+    }
+
+
+
+
+
+
+
+
+
+    @GetMapping("text")
+    @RequiresPermissions("goods:add")
+    public String text(){
+
+        return "text";
+    }
+
+    //跳转课程新增
+    @GetMapping("/addKeCheng")
+    @RequiresPermissions("goods:add")
+    public ModelAndView addKeCheng(){
+        return new ModelAndView("addKeCheng");
+    }
+
+    @RequestMapping("/bangDingJuese")
+    public  ModelAndView bangDingJuese(Integer userId){
+
+        ModelAndView mav = new ModelAndView();
+
+        mav.addObject("userid",userId);
+        mav.setViewName("jueseList");
         return mav;
     }
 
 
+    @GetMapping("/fuquan")
+    public ModelAndView tofuquan(Integer roleId){
 
-    //用户修改回显
-    @RequestMapping("/toUserEdit")
+
+        ModelAndView mav = new ModelAndView();
+
+        mav.addObject("roleId",roleId);
+        mav.setViewName("quanxianList");
+        return mav;
+
+    }
+
+
+
+//-------------------dd-------------------------------------
+    //跳转订单查询
+    @GetMapping("/order")
+    @RequiresPermissions("course:order")
+    public String order(){
+        return "HouTaiOrderList";
+    }
+    @RequestMapping("initOrderTable")
     @ResponseBody
-    public UserEntity toUserEdit(Integer userid){
+    public List<Order> initOrderTable(Order order){
 
-        return helloService.toUserEdit(userid);
+        return helloService.initOrderTable(order);
     }
 
-    //修改用户
-    @RequestMapping("/editUserBean")
+    @PostMapping("/deleteOrder")
     @ResponseBody
-    public void editUserBean(UserEntity user){
-        helloService.editUserBean(user);
+    public void deleteOrder(Integer id){
+        helloService.deleteOrder(id);
+    }
+//-----------------mulu---------------------------------------------
+    //跳转目录查询
+    @GetMapping("/catalogue")
+    @RequiresPermissions("course:catalogue")
+    public String catalogue(){
+        return "HouTaiCatalogueList";
     }
 
-
-    //用户删除
-    @GetMapping("/delete")
-    public String delete(Integer userid){
-        helloService.delete(userid);
-        return "redirect:userList";
-    }
-
-    //跳转用户新增
-    @GetMapping("/addUser")
-    @RequiresPermissions("user:add")
-    public ModelAndView addUser(){
-        return new ModelAndView("addUser");
-    }
-
-    //新增用户表
-    @RequestMapping("/addUserBean")
+    @RequestMapping("initMuLuTable")
     @ResponseBody
-    public void addUserBean(UserEntity user){
-        helloService.addUserBean(user);
+    public List<SectionBean> initMuLuTable(){
+
+        return helloService.initMuLuTable();
     }
 
-
-   /* @GetMapping("/hello")
-    public String hello(){
-        return helloService.hello();
-    }
-
-
-    @RequestMapping("toMain")
-    public String toMain(){
-        return "main";
-    }
-
-    @RequestMapping("selectTree")
+    @PostMapping("/deleteSection")
     @ResponseBody
-    public List<Tree> selectTree(){
-
-
-        return helloService.selectTree();
+    public String deleteSection(Integer id){
+        helloService.deleteSection(id);
+        return "1";
     }
 
 
-    @RequestMapping("/selectList")
+    @RequestMapping("toAddMuLu")
+    public String toAddMuLu(){
+
+        return "addMuLu";
+    }
+
+    @PostMapping("/addMuLu")
     @ResponseBody
-    public Map<String ,Object> selectList(Integer page,Integer rows,String mecname){
+    public void addMuLu(SectionBean  section){
 
-        Map<String ,Object> map = new HashMap<String,Object>();
-
-        map = helloService.selectList(page,rows,mecname);
-
-        return map;
+        helloService.addMuLu(section);
     }
 
 
-    @RequestMapping("/selectGoodsList")
-    @ResponseBody
-    public Map<String ,Object> selectGoodsList(Integer page,Integer rows){
-
-        Map<String ,Object> map = new HashMap<String,Object>();
-
-        map = helloService.selectGoodsList(page,rows);
-
-        return map;
-    }
 
 
-    @PostMapping("/deleteInfo")
-    @ResponseBody
-    public void deleteInfo(Integer id){
-        helloService.deleteInfo(id);
-    }
 
 
-    @RequestMapping("updateInfoById")
-    public String updateInfoById(Integer id, Model model){
-        Information info = helloService.updateInfoById(id);
-        model.addAttribute("in",info);
-        return "update";
-    }*/
 
 }

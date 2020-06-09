@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-table.css}">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="js/bootstrap3/css/bootstrap.css">
+    <script src="js/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <link rel="stylesheet" href="js/bootstrap-treeview/bootstrap-treeview.min.css">
+    <script src="js/bootStrap-addTabs/bootstrap.addtabs.js"></script>
+    <link rel="stylesheet" href="js/bootStrap-addTabs/bootstrap.addtabs.css">
+    <!-- 引入bootbox.js -->
+    <script src="js/bootbox/bootbox.js"></script>
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+
+    <script src="/js/fileinput/js/fileinput.js"></script>
+    <script src="/js/fileinput/js/locales/zh.js"></script>
+    <link rel="stylesheet" href="/js/fileinput/css/fileinput.css">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Title</title>
+</head>
+<form id="formId" class="form-horizontal">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">状态</label>
+        <div class="col-sm-6">
+            <select id="state" name="state" class="form-control">
+                <option value="-1">-请选择-</option>
+                <option value="1">展示中</option>
+                <option value="2">未开始</option>
+                <option value="3">已结束</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">排序</label>
+        <div class="col-sm-6">
+            <select id="sort" name="sort" class="form-control">
+                <option value="-1">-请选择-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">图片</label>
+        <div class="col-sm-6">
+            <input type="hidden" id="hideImg" name="img_age">
+            <input type="file" multiple class="projectfile" accept="image/*" name="file" id="inputImg">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">所属位置</label>
+        <div class="col-sm-6">
+            <select id="operation" name="operation" class="form-control">
+                <option value="-1">-请选择-</option>
+                <option value="1">运营位1</option>
+                <option value="2">运营位2</option>
+                <option value="3">运营位3</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+<script>
+    $('#inputImg').fileinput({
+        language: 'zh', //设置语言
+        uploadUrl: 'upload', //上传的地址
+        allowedFileExtensions: ['jpg', 'gif', 'png'],//接收的文件后缀
+        showUpload: true, //是否显示上传按钮
+        showCaption: false,//是否显示标题
+        browseClass: "btn btn-primary", //按钮样式
+        maxFileCount: 2, //表示允许同时上传的最大文件个数
+        enctype: 'multipart/form-data',
+        validateInitialCount:true,
+        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+        msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+    }).on('fileuploaded', function(event, data, previewId, index) {
+        var imgval = "http://localhost:8071/"+data.response.img;
+        $('#hideImg').val(imgval);
+    });
+
+
+
+</script>
+</body>
+</html>
