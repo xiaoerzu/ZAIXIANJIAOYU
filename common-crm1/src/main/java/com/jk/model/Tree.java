@@ -25,6 +25,7 @@ public class Tree implements Serializable {
 
 	private Boolean checked;
 
+<<<<<<< HEAD
 
 	private Map<String,Boolean> state;
 
@@ -131,4 +132,6 @@ public class Tree implements Serializable {
 				", state=" + state +
 				'}';
 	}
+=======
+>>>>>>> origin/master
 }

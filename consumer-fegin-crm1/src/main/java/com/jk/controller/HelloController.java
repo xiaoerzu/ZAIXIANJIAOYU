@@ -19,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+<<<<<<< HEAD
+=======
+import javax.servlet.http.HttpSession;
+>>>>>>> origin/master
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +50,19 @@ public class HelloController {
     //后台登录
     @PostMapping("/login")
     @ResponseBody
+<<<<<<< HEAD
     public String login(SysUser user){// 拿到subject对象 调用login方法 跳转到realm对象认证方法中
+=======
+    public String login(SysUser user, HttpSession session){
+
+        // 拿到subject对象 调用login方法 跳转到realm对象认证方法中
+>>>>>>> origin/master
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken upt = new UsernamePasswordToken(user.getUsercode(), user.getPassword());
 
         try{
             subject.login(upt);
+            session.setAttribute("user",user.getId());
             return "登录成功";
         } catch (UnknownAccountException uae) {
             return "账号不存在";
@@ -74,6 +85,11 @@ public class HelloController {
         return "mainHouTai";
     }
 
+    @GetMapping("/userList")
+    public String tolist(){
+        return "list";
+    }
+
 
     @PostMapping("/queryTree")
     @ResponseBody
@@ -86,11 +102,19 @@ public class HelloController {
 //-----------------------1---------------------------------------------------------------
 
 
+<<<<<<< HEAD
     //数据统计  跳转
     @GetMapping("/graph")
     @RequiresPermissions("bk:query")
     public String graph(){
         return "echarts";
+=======
+    //跳转课程查询
+    @GetMapping("/list")
+    @RequiresPermissions("course:query")
+    public String list(){
+        return "HouTaiKeChengList";
+>>>>>>> origin/master
     }
 
     //条形图  统计
@@ -98,6 +122,7 @@ public class HelloController {
     @ResponseBody
     public List<StatementBean> initMyChart3(){
 
+<<<<<<< HEAD
         return helloService.initMyChart3();
     }
 
@@ -406,4 +431,113 @@ public class HelloController {
 
 
 
+=======
+    //跳转课程查询
+    @GetMapping("/user")
+    @RequiresPermissions("user:query")
+    public String user(){
+        return "HouTaiYongHuList";
+    }
+
+    //跳转角色查询
+    @GetMapping("/role")
+    @RequiresPermissions("user:query")
+    public String role(){
+        return "HouTaiJueSeList";
+    }
+
+    //课程条查  查询  分页
+    @RequestMapping("initKeChengTable")
+    @ResponseBody
+    public List<CourseEntity> initKeChengTable(CourseEntity course){
+
+        return helloService.initKeChengTable(course);
+    }
+
+
+    @RequestMapping("/inityongHuTable")
+    @ResponseBody
+    public List<SysUser> inityongHuTable(){
+        return helloService.inityongHuTable();
+    }
+
+    @RequestMapping("/initJueSeTable")
+    @ResponseBody
+    public List<Role> initJueSeTable(){
+        return helloService.initJueSeTable();
+    }
+
+    @PostMapping("/deleteCourse")
+    @ResponseBody
+    public void deleteCourse(Integer id){
+        helloService.deleteCourse(id);
+    }
+
+    @RequestMapping("/compileById")
+    @ResponseBody
+    public ModelAndView compileById(Integer id){
+        CourseEntity course = helloService.compileById(id);
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("course",course);
+        mav.setViewName("editKeCheng");
+
+        return mav;
+    }
+
+    @RequestMapping("/toAddKeCheng")
+    public String toAddKeCheng(){
+
+        return "addKeCheng";
+    }
+
+
+    @PostMapping("/addKeCheng")
+    @ResponseBody
+    public void addKeCheng(CourseEntity course){
+
+        helloService.addKeCheng(course);
+    }
+
+    //回显图片
+    @RequestMapping("upload")
+    @ResponseBody
+    private Map upload(MultipartFile file, HttpServletRequest request){
+        HashMap<String, Object> hashMap = new HashMap<>();
+        String fileUpload = FileUtil.FileUpload(file, request);
+        hashMap.put("img", fileUpload);
+        return hashMap;
+    }
+
+    @PostMapping("/editKeChengBean")
+    @ResponseBody
+    public void editKeChengBean(CourseEntity course){
+        helloService.editKeChengBean(course);
+    }
+
+    //查询角色
+    @RequestMapping("/initjueseTable")
+    @ResponseBody
+    public List<Role> initjueseTable(Integer userid){
+
+        List<Role>  list = helloService.initjueseTable(userid);
+        return list;
+
+    }
+
+    @RequestMapping("/addJueSe")
+    @ResponseBody
+    public void addJueSe(String roleId,Integer userId){
+
+       helloService.addJueSe(roleId,userId);
+    }
+
+
+    @RequestMapping("/queryTreeById")
+    @ResponseBody
+    public List<Tree> queryTreeById(Integer roleId){
+        return helloService.queryTreeById(roleId);
+    }
+
+>>>>>>> origin/master
 }

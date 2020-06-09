@@ -1,12 +1,21 @@
 package com.jk.model;
 
+<<<<<<< HEAD
 public class RolePermission {
+=======
+import lombok.Data;
+
+@Data
+public class RolePermission {
+
+>>>>>>> origin/master
     private Integer id;
 
     private Integer sysroleid;
 
     private Integer syspermissionid;
 
+<<<<<<< HEAD
     public RolePermission(Integer id, Integer sysroleid, Integer syspermissionid) {
         this.id = id;
         this.sysroleid = sysroleid;
@@ -49,4 +58,6 @@ public class RolePermission {
                 ", syspermissionid=" + syspermissionid +
                 '}';
     }
+=======
+>>>>>>> origin/master
 }

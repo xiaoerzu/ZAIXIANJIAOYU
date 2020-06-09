@@ -56,7 +56,11 @@ public class ShiroConfig {
         map.put("/img/**","anon");
         //其他的都拦截
         map.put("/**","authc");
+<<<<<<< HEAD
         //map.put("/toMainHouTai","authc");
+=======
+        map.put("/toMainHouTai","authc");
+>>>>>>> origin/master
         // 将自定义的过滤器设置到shiro过滤器链中
         sfb.setFilterChainDefinitionMap(map);
         return sfb;

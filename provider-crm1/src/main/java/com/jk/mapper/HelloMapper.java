@@ -8,6 +8,10 @@ import java.util.List;
 @Mapper
 public interface HelloMapper {
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
     @Select("select sp.percode \n" +
             "from sys_user_role sur,\n" +
             "sys_role_permission srp,\n" +
@@ -54,7 +58,11 @@ public interface HelloMapper {
     void addKeCheng(CourseEntity course);
 
     @Update("UPDATE 1908_course SET coursetitle=#{coursetitle},coursetype=#{coursetype}, " +
+<<<<<<< HEAD
             "authername=#{authername},courseprice=#{courseprice}, " +
+=======
+            "courseimg=#{courseimg},authername=#{authername},courseprice=#{courseprice}, " +
+>>>>>>> origin/master
             "coursecontext=#{coursecontext}  WHERE courseid =#{courseid}")
     void editKeChengBean(CourseEntity course);
 
@@ -64,6 +72,7 @@ public interface HelloMapper {
     @Select("select * from sys_role")
     List<Role> initjueseTable();
 
+<<<<<<< HEAD
 
 
 
@@ -121,6 +130,25 @@ public interface HelloMapper {
 
     @Select("select * from sys_role")
     List<Role> initJueSeTable();
+=======
+    @Insert("insert into sys_user_role (sys_user_id,sys_role_id) values (#{userId},#{roleId})")
+    void addJueSe(Integer roleId, Integer userId);
+
+    @Select("select sys_user_id as sysuserid,sys_role_id as sysroleid from  sys_user_role where sys_user_id = #{userid}")
+    List<UserRole> queryUserRole(Integer userid);
+
+    @Delete("delete from sys_user_role where sys_user_id = #{userId}")
+    void deleteJuese(Integer userId);
+
+    @Select("select * from sys_role")
+    List<Role> initJueSeTable();
+
+    @Select("select sys_permission_id as syspermissionid from sys_role_permission where sys_role_id = #{roleId}")
+    List<Integer> queryTreeByRoleId(Integer roleId);
+
+    @Select("select sp.id as id,sp.name as text, sp.url as href, sp.parentid as pid from sys_permission sp where parentid = #{pid}")
+    List<Tree> queryAllTree(Integer pid);
+>>>>>>> origin/master
 
     @Select("select sys_permission_id as syspermissionid from sys_role_permission where sys_role_id = #{roleId}")
     List<Integer> queryTreeByRoleId(Integer roleId);

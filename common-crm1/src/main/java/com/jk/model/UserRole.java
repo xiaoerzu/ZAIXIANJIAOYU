@@ -1,12 +1,21 @@
 package com.jk.model;
 
+<<<<<<< HEAD
 public class UserRole {
+=======
+import lombok.Data;
+
+@Data
+public class UserRole {
+
+>>>>>>> origin/master
     private Integer id;
 
     private String sysuserid;
 
     private Integer sysroleid;
 
+<<<<<<< HEAD
     public UserRole(Integer id, String sysuserid, Integer sysroleid) {
         this.id = id;
         this.sysuserid = sysuserid;
@@ -49,4 +58,7 @@ public class UserRole {
                 ", sysroleid=" + sysroleid +
                 '}';
     }
+=======
+
+>>>>>>> origin/master
 }
